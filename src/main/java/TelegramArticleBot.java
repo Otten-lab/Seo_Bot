@@ -547,5 +547,15 @@ public class TelegramArticleBot extends TelegramLongPollingBot {
     public static void main(String[] args) throws Exception {
         new TelegramBotsApi(DefaultBotSession.class).registerBot(new TelegramArticleBot());
         System.out.println("Bot started");
+        System.out.println("=== Starting Bot ===");
+        System.out.println("Environment variables check:");
+        System.out.println("BOT_USERNAME: " + (BOT_USERNAME != null ? "set" : "NULL"));
+        System.out.println("BOT_TOKEN: " + (BOT_TOKEN != null ? "set (length: " + BOT_TOKEN.length() + ")" : "NULL"));
+        System.out.println("N8N_WEBHOOK_URL: " + (N8N_WEBHOOK_URL != null ? "set" : "NULL"));
+        System.out.println("CHANNEL_ID: " + (CHANNEL_ID != null ? "set" : "NULL"));
+        System.out.println("BASEROW_API_URL: " + (BASEROW_API_URL != null ? "set" : "NULL"));
+        System.out.println("BASEROW_TOKEN: " + (BASEROW_TOKEN != null ? "set" : "NULL"));
+        System.out.println("IMGBB_API_KEY: " + (IMGBB_API_KEY != null ? "set" : "NULL"));
+        System.out.println("IMGBB_UPLOAD_URL: " + (IMGBB_UPLOAD_URL != null ? "set" : "NULL"));
     }
 }
