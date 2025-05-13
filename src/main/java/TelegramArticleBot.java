@@ -3,8 +3,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updates.DeleteWebhook;
+import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -12,6 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.WebhookBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.ByteArrayOutputStream;
@@ -21,7 +26,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.*;
 
-public class TelegramArticleBot extends TelegramLongPollingBot {
+public class TelegramArticleBot extends TelegramLongPollingBot implements WebhookBot {
     // =============== CONFIG ================
     private static final String BOT_TOKEN = System.getenv("BOT_TOKEN");
     private static final String BOT_USERNAME = System.getenv("BOT_USERNAME");
@@ -32,6 +37,21 @@ public class TelegramArticleBot extends TelegramLongPollingBot {
     private static final String BASEROW_TOKEN = System.getenv("BASEROW_TOKEN");
     private static final String IMGBB_API_KEY = System.getenv("IMGBB_API_KEY");
     private static final String IMGBB_UPLOAD_URL = System.getenv("IMGBB_UPLOAD_URL");
+
+    @Override
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+        return null;
+    }
+
+    @Override
+    public void setWebhook(SetWebhook setWebhook) throws TelegramApiException {
+
+    }
+
+    @Override
+    public String getBotPath() {
+        return "";
+    }
     // =======================================
 
     private enum ChannelType { TG, SITE }
@@ -544,18 +564,28 @@ public class TelegramArticleBot extends TelegramLongPollingBot {
     @Override public String getBotUsername() { return BOT_USERNAME; }
     @Override public String getBotToken() { return BOT_TOKEN; }
 
-    public static void main(String[] args) throws Exception {
-        new TelegramBotsApi(DefaultBotSession.class).registerBot(new TelegramArticleBot());
-        System.out.println("Bot started");
-        System.out.println("=== Starting Bot ===");
-        System.out.println("Environment variables check:");
-        System.out.println("BOT_USERNAME: " + (BOT_USERNAME != null ? "set" : "NULL"));
-        System.out.println("BOT_TOKEN: " + (BOT_TOKEN != null ? "set (length: " + BOT_TOKEN.length() + ")" : "NULL"));
-        System.out.println("N8N_WEBHOOK_URL: " + (N8N_WEBHOOK_URL != null ? "set" : "NULL"));
-        System.out.println("CHANNEL_ID: " + (CHANNEL_ID != null ? "set" : "NULL"));
-        System.out.println("BASEROW_API_URL: " + (BASEROW_API_URL != null ? "set" : "NULL"));
-        System.out.println("BASEROW_TOKEN: " + (BASEROW_TOKEN != null ? "set" : "NULL"));
-        System.out.println("IMGBB_API_KEY: " + (IMGBB_API_KEY != null ? "set" : "NULL"));
-        System.out.println("IMGBB_UPLOAD_URL: " + (IMGBB_UPLOAD_URL != null ? "set" : "NULL"));
+    public static void main(String[] args) {
+        try {
+            System.out.println("=== Starting Bot ===");
+            System.out.println("BOT_USERNAME: " + (BOT_USERNAME != null ? BOT_USERNAME : "NULL"));
+            System.out.println("BOT_TOKEN: " + (BOT_TOKEN != null ? "***" + BOT_TOKEN.substring(BOT_TOKEN.length()-4) : "NULL"));
+
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            TelegramArticleBot bot = new TelegramArticleBot();
+            try {
+                bot.execute(new DeleteWebhook());
+                System.out.println("Webhook successfully removed");
+            } catch (Exception e) {
+                System.err.println("Warning: Could not remove webhook - " + e.getMessage());
+            }
+            botsApi.registerBot(bot);
+        
+
+            System.out.println("✅ Bot successfully started!");
+        } catch (Exception e) {
+            System.err.println("❌ Failed to start bot:");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }
