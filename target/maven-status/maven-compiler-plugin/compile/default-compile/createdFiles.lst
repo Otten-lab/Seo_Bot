@@ -1,0 +1,5 @@
+TelegramArticleBot$ActionType.class
+TelegramArticleBot$ChannelType.class
+TelegramArticleBot$UserState.class
+TelegramArticleBot$ArticleResult.class
+TelegramArticleBot.class
